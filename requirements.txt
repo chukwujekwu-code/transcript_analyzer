@@ -1,0 +1,6 @@
+pdfplumber
+pandas
+cohere
+streamlit
+python-dotenv
+plotly
