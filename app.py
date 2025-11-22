@@ -38,7 +38,7 @@ CSS = """
 
 /* Bring everything closer to the top */
 .block-container {
-    padding-top: 3.5rem !important;
+    padding-top: 6.5rem !important;
 }
 
 .stApp {
@@ -58,7 +58,7 @@ CSS = """
     display: flex;
     justify-content: center;
     margin-top: 0.15rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
 }
 
 .app-header {
@@ -72,6 +72,7 @@ CSS = """
     border: 1px solid rgba(148, 163, 184, 0.45);
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
     backdrop-filter: blur(18px);
+    margin-bottom: 0;
 }
 
 .app-header-main {
@@ -359,7 +360,7 @@ div[data-testid="metric-container"] {
 /* ---------- Mobile tweaks ---------- */
 @media (max-width: 768px) {
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 3.5rem !important;
     }
 
     .app-container {
@@ -369,7 +370,7 @@ div[data-testid="metric-container"] {
 
     .app-header-shell {
         margin-top: 0;
-        margin-bottom: 1rem;
+        margin-bottom: 0.1rem;
     }
 
     .app-header {
@@ -393,11 +394,12 @@ div[data-testid="metric-container"] {
     }
 
     .upload-shell {
+        margin-top: 0;
         margin-bottom: 1.1rem;
     }
 
     .upload-card {
-        padding: 1rem 1rem;
+        padding-top: 0.6rem 1rem;
         border-radius: 1rem;
     }
 
@@ -410,7 +412,7 @@ div[data-testid="metric-container"] {
     }
 
     .hero {
-        margin-top: 0.85rem;
+        margin-top: 0;
         padding: 1.4rem 1.1rem;
         border-radius: 1.25rem;
         flex-direction: column;
