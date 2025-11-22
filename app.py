@@ -120,15 +120,6 @@ CSS = """
     white-space: nowrap;
 }
 
-/* Mobile tweaks */
-@media (max-width: 768px) {
-    .app-header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0.55rem 0.9rem;
-    }
-}
-
 /* ---------- Upload card ---------- */
 
 .upload-shell {
@@ -363,6 +354,112 @@ div[data-testid="metric-container"] {
     padding: 0.7rem 0.9rem;
     border: 1px solid var(--border-subtle);
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+/* ---------- Mobile tweaks ---------- */
+@media (max-width: 768px) {
+    .block-container {
+        padding-top: 1.5rem !important;
+    }
+
+    .app-container {
+        max-width: 100%;
+        padding: 0 0.9rem 2.3rem;
+    }
+
+    .app-header-shell {
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    .app-header {
+        width: 100%;
+        border-radius: 1.25rem;
+        padding: 0.55rem 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .app-header-title {
+        font-size: 0.92rem;
+    }
+
+    .app-header-subtitle {
+        font-size: 0.78rem;
+    }
+
+    .app-header-tag {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.6rem;
+    }
+
+    .upload-shell {
+        margin-bottom: 1.1rem;
+    }
+
+    .upload-card {
+        padding: 1rem 1rem;
+        border-radius: 1rem;
+    }
+
+    .upload-title {
+        font-size: 0.95rem;
+    }
+
+    .upload-body {
+        font-size: 0.82rem;
+    }
+
+    .hero {
+        margin-top: 0.85rem;
+        padding: 1.4rem 1.1rem;
+        border-radius: 1.25rem;
+        flex-direction: column;
+        gap: 1.4rem;
+    }
+
+    .hero-left,
+    .hero-right {
+        min-width: 100%;
+        flex: 1 1 auto;
+    }
+
+    .main-header {
+        font-size: 1.7rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .sub-header {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-card {
+        padding: 1.3rem 1.1rem;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    .hero-stat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+    }
+
+    .hero-stat {
+        padding: 0.6rem 0.55rem;
+    }
+
+    .section {
+        margin-top: 2rem;
+    }
+
+    .section-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 """
