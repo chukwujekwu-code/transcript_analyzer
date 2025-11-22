@@ -792,11 +792,8 @@ else:
         if st.button("Identify skill gaps", type="primary"):
             with st.spinner("Comparing your profile to the target role…"):
                 try:
-                    gaps = identify_skill_gaps(
-                        df,
-                        student_info,
-                        target_role if target_role else None,
-                    )
+                    role_for_analysis = target_role.strip() if target_role else ""
+                    gaps = identify_skill_gaps(df, student_info, role_for_analysis)
                     st.markdown(gaps)
                 except Exception as e:
                     st.error(f"Error: {e}")
