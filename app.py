@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+
 from src.parser import parse_transcript, get_quick_stats
 from src.advisor import (
     generate_project_ideas,
@@ -21,8 +22,8 @@ st.set_page_config(
 # -------------------------------------------------------------------
 # Global styling
 # -------------------------------------------------------------------
-st.markdown(
-    """<style>
+CSS = """
+<style>
 :root {
     --primary: #2563eb;
     --primary-soft: #eff6ff;
@@ -37,7 +38,7 @@ st.markdown(
 
 /* Bring everything closer to the top */
 .block-container {
-    padding-top: 5rem !important;
+    padding-top: 3.5rem !important;
 }
 
 .stApp {
@@ -57,7 +58,7 @@ st.markdown(
     display: flex;
     justify-content: center;
     margin-top: 0.15rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
 }
 
 .app-header {
@@ -128,6 +129,47 @@ st.markdown(
     }
 }
 
+/* ---------- Upload card ---------- */
+
+.upload-shell {
+    margin-bottom: 1.5rem;
+}
+
+.upload-card {
+    border-radius: 1.25rem;
+    padding: 1.2rem 1.4rem;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+.upload-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.3rem;
+}
+
+.upload-body {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+}
+
+/* Make the file uploader blend into the card */
+.upload-card div[data-testid="stFileUploader"] {
+    padding-top: 0.2rem;
+}
+
+.upload-card div[data-testid="stFileUploader"] label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.upload-card div[data-testid="stFileUploader"] section[data-testid="stFileUploadDropzone"] {
+    border-radius: 0.9rem;
+}
+
 /* ---------- Hero + sections ---------- */
 
 .main-header {
@@ -146,7 +188,7 @@ st.markdown(
 }
 
 .hero {
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
     padding: 2.0rem 2.3rem;
     border-radius: 1.5rem;
     background: radial-gradient(circle at top left, #eff6ff 0, #ffffff 50%, #f9fafb 100%);
@@ -322,39 +364,34 @@ div[data-testid="metric-container"] {
     border: 1px solid var(--border-subtle);
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
 }
-
-/* Tighten sidebar top padding a bit */
-section[data-testid="stSidebar"] > div {
-    padding-top: 1.0rem;
-}
 </style>
-""",
-    unsafe_allow_html=True,
-)
+"""
+
+st.markdown(CSS, unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
-# App header (top center, shared)
+# App header (top center)
 # -------------------------------------------------------------------
-st.markdown(
-    """<div class="app-container">
+HEADER_HTML = """
+<div class="app-container">
 <div class="app-header-shell">
-  <div class="app-header">
-    <div class="app-header-main">
-      <div class="app-logo-pill">🎓</div>
-      <div class="app-header-text">
-        <div class="app-header-title">UNILAG Transcript Advisor</div>
-        <div class="app-header-subtitle">
-          Turn your transcript into clear insights, project ideas & career direction.
-        </div>
-      </div>
-    </div>
-    <div class="app-header-tag">AI-powered</div>
-  </div>
+<div class="app-header">
+<div class="app-header-main">
+<div class="app-logo-pill">🎓</div>
+<div class="app-header-text">
+<div class="app-header-title">UNILAG Transcript Advisor</div>
+<div class="app-header-subtitle">
+Turn your transcript into clear insights, project ideas &amp; career direction.
 </div>
 </div>
-""",
-    unsafe_allow_html=True,
-)
+</div>
+<div class="app-header-tag">AI-powered</div>
+</div>
+</div>
+</div>
+"""
+
+st.markdown(HEADER_HTML, unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # Session state
@@ -364,154 +401,178 @@ if "df" not in st.session_state:
 if "student_info" not in st.session_state:
     st.session_state["student_info"] = None
 
-# -------------------------------------------------------------------
-# Sidebar
-# -------------------------------------------------------------------
-with st.sidebar:
-    st.markdown("### 📂 Upload transcript")
-    uploaded_file = st.file_uploader("Upload your UNILAG transcript (PDF)", type=["pdf"])
-
-    if uploaded_file:
-        with open("temp_transcript.pdf", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-        with st.spinner("Parsing transcript…"):
-            try:
-                df, student_info = parse_transcript("temp_transcript.pdf")
-                st.session_state["df"] = df
-                st.session_state["student_info"] = student_info
-                st.success("✅ Transcript parsed successfully")
-            except Exception as e:
-                st.error(f"Error parsing transcript: {e}")
-
-    st.markdown("---")
-
-    if st.session_state["df"] is not None:
-        df = st.session_state["df"]
-        st.markdown("#### Quick snapshot")
-        stats = get_quick_stats(df)
-        st.metric("Total Courses", stats["total_courses"])
-        st.metric("Overall GPA", stats["overall_gpa"])
-        st.metric("Total Credits", stats["total_credits"])
+df = st.session_state["df"]
+student_info = st.session_state["student_info"]
 
 # -------------------------------------------------------------------
 # Main content container
 # -------------------------------------------------------------------
+st.markdown('<div class="app-container">', unsafe_allow_html=True)
+
+# -------------------------------------------------------------------
+# Upload card (main screen)
+# -------------------------------------------------------------------
+with st.container():
+    st.markdown('<div class="upload-shell"><div class="upload-card">', unsafe_allow_html=True)
+
+    left, right = st.columns([2, 3])
+
+    with left:
+        UPLOAD_COPY = """
+<div class="upload-title">Upload your UNILAG transcript</div>
+<div class="upload-body">
+Drop in your official PDF transcript. We’ll parse it automatically and build your dashboard
+— no manual data entry.
+</div>
+"""
+        st.markdown(UPLOAD_COPY, unsafe_allow_html=True)
+
+    with right:
+        uploaded_file = st.file_uploader(
+            "Choose your transcript (PDF)",
+            type=["pdf"],
+            label_visibility="collapsed",
+            key="transcript_uploader",
+        )
+
+        if uploaded_file is not None:
+            with st.spinner("Parsing transcript…"):
+                try:
+                    with open("temp_transcript.pdf", "wb") as f:
+                        f.write(uploaded_file.getbuffer())
+                    df, student_info = parse_transcript("temp_transcript.pdf")
+                    st.session_state["df"] = df
+                    st.session_state["student_info"] = student_info
+                    st.success("✅ Transcript parsed successfully")
+                except Exception as e:
+                    st.error(f"Error parsing transcript: {e}")
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
+
 df = st.session_state["df"]
 student_info = st.session_state["student_info"]
 
-st.markdown('<div class="app-container">', unsafe_allow_html=True)
+# -------------------------------------------------------------------
+# Quick snapshot under upload (if transcript loaded)
+# -------------------------------------------------------------------
+if df is not None:
+    stats = get_quick_stats(df)
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.metric("Total Courses", stats["total_courses"])
+    with c2:
+        st.metric("Overall GPA", stats["overall_gpa"])
+    with c3:
+        st.metric("Total Credits", stats["total_credits"])
 
 # -------------------------------------------------------------------
 # Empty state (no transcript yet)
 # -------------------------------------------------------------------
 if df is None:
-    hero_html = """<div class="hero">
+    HERO_HTML = """
+<div class="hero">
 <div class="hero-left">
-  <h1 class="main-header">Understand your transcript in minutes.</h1>
-  <p class="sub-header">
-    Upload your official UNILAG transcript once and get an overview of your performance,
-    tailored project ideas, and career pathway suggestions.
-  </p>
-
-  <ul class="hero-list">
-    <li><span class="hero-dot"></span> See your GPA and credit progress at a glance</li>
-    <li><span class="hero-dot"></span> Get final-year project ideas that match your strengths</li>
-    <li><span class="hero-dot"></span> Discover realistic career paths based on your courses</li>
-  </ul>
-
-  <p class="hero-hint">
-    📎 Start by uploading your PDF in the left sidebar. No manual data entry required.
-  </p>
+<h1 class="main-header">Understand your transcript in minutes.</h1>
+<p class="sub-header">
+Upload your official UNILAG transcript once and get an overview of your performance,
+tailored project ideas, and career pathway suggestions.
+</p>
+<ul class="hero-list">
+<li><span class="hero-dot"></span> See your GPA and credit progress at a glance</li>
+<li><span class="hero-dot"></span> Get final-year project ideas that match your strengths</li>
+<li><span class="hero-dot"></span> Discover realistic career paths based on your courses</li>
+</ul>
+<p class="hero-hint">
+📎 Start by uploading your PDF above. No manual data entry required.
+</p>
 </div>
-
 <div class="hero-right">
-  <div class="hero-card">
-    <div class="hero-card-header">
-      <span>Preview of your dashboard</span>
-      <span class="hero-chip">Sample</span>
-    </div>
-    <div class="hero-stat-grid">
-      <div class="hero-stat">
-        <div class="hero-stat-label">Total Courses</div>
-        <div class="hero-stat-value">52</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-label">Overall GPA</div>
-        <div class="hero-stat-value">4.21</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-label">Total Credits</div>
-        <div class="hero-stat-value">132</div>
-      </div>
-    </div>
-    <p class="hero-caption">
-      Once your transcript is uploaded, you’ll see your real numbers here – plus charts,
-      AI-generated project ideas, and more.
-    </p>
-  </div>
+<div class="hero-card">
+<div class="hero-card-header">
+<span>Preview of your dashboard</span>
+<span class="hero-chip">Sample</span>
+</div>
+<div class="hero-stat-grid">
+<div class="hero-stat">
+<div class="hero-stat-label">Total Courses</div>
+<div class="hero-stat-value">52</div>
+</div>
+<div class="hero-stat">
+<div class="hero-stat-label">Overall GPA</div>
+<div class="hero-stat-value">4.21</div>
+</div>
+<div class="hero-stat">
+<div class="hero-stat-label">Total Credits</div>
+<div class="hero-stat-value">132</div>
+</div>
+</div>
+<p class="hero-caption">
+Once your transcript is uploaded, you’ll see your real numbers here – plus charts,
+AI-generated project ideas, and more.
+</p>
+</div>
 </div>
 </div>
 """
-    st.markdown(hero_html, unsafe_allow_html=True)
+    st.markdown(HERO_HTML, unsafe_allow_html=True)
 
-    feature_html = """<div class="section">
+    FEATURE_HTML = """
+<div class="section">
 <div class="section-title-row">
-  <div class="section-title">What you get</div>
-  <div class="section-subtitle">
-    Designed specifically for UNILAG students in their 200–500 level.
-  </div>
+<div class="section-title">What you get</div>
+<div class="section-subtitle">
+Designed specifically for UNILAG students in their 200–500 level.
+</div>
 </div>
 <div class="feature-grid">
-  <div class="feature-item">
-    <div class="feature-icon">🎯</div>
-    <div class="feature-title">Personalised project ideas</div>
-    <div class="feature-body">
-      AI suggests final-year project ideas that align with your courses, grades,
-      and interests.
-    </div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">💼</div>
-    <div class="feature-title">Career pathway explorer</div>
-    <div class="feature-body">
-      See realistic career paths you can grow into, plus how your current profile
-      already matches each one.
-    </div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">📈</div>
-    <div class="feature-title">Performance overview</div>
-    <div class="feature-body">
-      Visualize your best semesters, low points, and long-term GPA trend using clear,
-      interactive charts.
-    </div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">📚</div>
-    <div class="feature-title">Skill gaps &amp; next steps</div>
-    <div class="feature-body">
-      Identify missing skills and get recommendations on courses, topics, or projects
-      to close the gap.
-    </div>
-  </div>
+<div class="feature-item">
+<div class="feature-icon">🎯</div>
+<div class="feature-title">Personalised project ideas</div>
+<div class="feature-body">
+AI suggests final-year project ideas that align with your courses, grades,
+and interests.
+</div>
+</div>
+<div class="feature-item">
+<div class="feature-icon">💼</div>
+<div class="feature-title">Career pathway explorer</div>
+<div class="feature-body">
+See realistic career paths you can grow into, plus how your current profile
+already matches each one.
+</div>
+</div>
+<div class="feature-item">
+<div class="feature-icon">📈</div>
+<div class="feature-title">Performance overview</div>
+<div class="feature-body">
+Visualize your best semesters, low points, and long-term GPA trend using clear,
+interactive charts.
+</div>
+</div>
+<div class="feature-item">
+<div class="feature-icon">📚</div>
+<div class="feature-title">Skill gaps &amp; next steps</div>
+<div class="feature-body">
+Identify missing skills and get recommendations on courses, topics, or projects
+to close the gap.
+</div>
+</div>
 </div>
 </div>
 """
-    st.markdown(feature_html, unsafe_allow_html=True)
+    st.markdown(FEATURE_HTML, unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # Loaded state (transcript parsed)
 # -------------------------------------------------------------------
 else:
-    st.markdown(
-        """<div class="section-title-row" style="margin-top: 1.5rem;">
+    TITLE_HTML = """
+<div class="section-title-row" style="margin-top: 1.5rem;">
 <div class="section-title">Student overview</div>
 <div class="section-subtitle">Pulled automatically from your transcript.</div>
 </div>
-""",
-        unsafe_allow_html=True,
-    )
+"""
+    st.markdown(TITLE_HTML, unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -658,7 +719,7 @@ else:
 # -------------------------------------------------------------------
 st.markdown("---")
 st.markdown(
-    "<p class='footer-text'>Built for UNILAG students 🚀 &nbsp;·&nbsp; Powered by Cohere AI</p>",
+    '<p class="footer-text">Built for UNILAG students 🚀 &nbsp;·&nbsp; Powered by Cohere AI</p>',
     unsafe_allow_html=True,
 )
 st.markdown("</div>", unsafe_allow_html=True)
