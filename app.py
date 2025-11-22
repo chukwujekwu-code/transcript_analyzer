@@ -399,7 +399,7 @@ div[data-testid="metric-container"] {
     }
 
     .upload-card {
-        padding-top: 0.6rem 1rem;
+        padding: 0.6rem 1rem;
         border-radius: 1rem;
     }
 
