@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import cohere
 import pandas as pd
@@ -139,7 +140,11 @@ Be specific about Nigerian companies like Andela, Flutterwave, Interswitch, bank
     return response.text
 
 
-def identify_skill_gaps(df: pd.DataFrame, student_info: Dict, target_role: str = None) -> str:
+def identify_skill_gaps(
+    df: pd.DataFrame,
+    student_info: Dict,
+    target_role: str | None = None,
+) -> str:
     """
     Identify skill gaps and provide learning recommendations.
     
